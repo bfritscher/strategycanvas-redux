@@ -1,0 +1,141 @@
+svg {
+    font-size: 14px;
+  }
+
+  svg .mainaxis{
+  }
+
+  svg .legendbackground{
+    fill: #fff;
+
+  }
+
+  svg body{
+    background-color: #fff;
+    position: initial;
+  }
+
+  svg .dot rect{
+    opacity:0;
+  }
+
+  svg  rect.backgroundFactor{
+    opacity:1;
+  }
+
+
+  svg rect.border{
+    stroke-width: 2px;
+    stroke: #adc8e3;
+    fill: #fbfbfb;
+  }
+
+  svg .factor{
+    -ms-touch-action: none;
+  }
+
+  svg .factorSize{
+    cursor: col-resize;
+  }
+
+  svg rect.factorSize{
+    fill: none;
+    stroke: none;
+    pointer-events: all;
+  }
+
+  svg g.addfactor{
+    cursor: pointer;
+  }
+
+  svg g.addfactor:hover text{
+    fill: #e3e3e3 !important;
+  }
+
+  #mychart{
+    display:block;
+    text-align: center;
+    overflow: auto;
+    position: relative;
+  }
+
+
+  #mychart div.iexlegend{
+    position: absolute;
+  }
+
+  #mychart svg{
+    border: 1px #dadada solid;
+    background-color: #fff;
+    padding: 20px 20px 20px 20px;
+    margin: 10px 10px 10px 10px;
+    cursor: default;
+  }
+
+  #mychart.chat-visible{
+    margin-right: 250px;
+  }
+
+  #mychart.no-edit .axis .domain{
+    cursor: default;
+  }
+  #mychart.no-edit .axis text, #mychart.no-edit .dot{
+    cursor: default;
+  }
+  #mychart.no-edit .xlegend, #mychart.no-edit .iexlegend{
+    cursor: default;
+  }
+  #mychart.no-edit svg .factorSize{
+    cursor: default;
+  }
+  #mychart.no-edit svg g.addfactor{
+    cursor: default;
+  }
+
+  .foreground path {
+    fill: none;
+    stroke-opacity: .5;
+    stroke-width: 3px;
+  }
+
+  .foreground path.fade {
+    stroke: #000;
+    stroke-opacity: .05;
+  }
+
+  .dash{
+    stroke-width: 6;
+  }
+
+  .axis .domain{
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .axis line, .axis path {
+    fill: none;
+    stroke: #000;
+    pointer-events: none;
+  }
+
+  .axis text, .dot {
+    text-shadow: 0 1px 0 #fff;
+    cursor: move;
+  }
+
+  .xlegend, .iexlegend{
+    font-weight: 600;
+    text-align: center;
+    word-wrap:break-word;
+    cursor: pointer;
+  }
+
+  .no-select{
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    cursor: default;
+  }
