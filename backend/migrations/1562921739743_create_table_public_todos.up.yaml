@@ -1,0 +1,11 @@
+- args:
+    sql: CREATE TABLE "public"."todos"("id" serial NOT NULL, "title" text NOT NULL,
+      "is_completed" boolean NOT NULL DEFAULT true, "is_public" boolean NOT NULL DEFAULT
+      false, "created_at" timestamptz NOT NULL DEFAULT now(), "user_id" text NOT NULL,
+      PRIMARY KEY ("id") , FOREIGN KEY ("user_id") REFERENCES "public"."users"("id")
+      ON UPDATE restrict ON DELETE restrict);
+  type: run_sql
+- args:
+    name: todos
+    schema: public
+  type: add_existing_table_or_view

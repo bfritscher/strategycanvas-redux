@@ -1,0 +1,7 @@
+- args:
+    name: users
+    new_name: user
+    table:
+      name: online_users
+      schema: public
+  type: rename_relationship
