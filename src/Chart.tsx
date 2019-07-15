@@ -2,78 +2,29 @@ import * as React from 'react';
 import * as d3 from 'd3';
 import $ from 'jquery';
 import './Chart.css';
+import * as models from './models/Chart';
 
-const SymbolsLookup: { [s: string]: d3.SymbolType } = {
-  circle: d3.symbolCircle,
-  cross: d3.symbolCross,
-  diamond: d3.symbolDiamond,
-  square: d3.symbolSquare,
-  star: d3.symbolStar,
-  triangle: d3.symbolTriangle,
-  wye: d3.symbolWye
-};
-
-function useHookWithRefCallback() {
+function useHookWithRefCallback(chart:models.Chart) {
   const [ref, setRef] = React.useState<Element | null | undefined>(null);
+  const [redraw, setRedraw] = React.useState<any>({ redraw: true });
 
   React.useEffect(() => {
     if (!ref) return;
-
+    console.log('useEffect Chart');
     type Point = [number, number];
-
-    interface Chart {
-      factors: string[];
-      editCode: boolean;
-      series: Serie[];
-    }
-    interface Serie {
-      business: string;
-      color: string;
-      symbol: string;
-      dash: string;
-      offerings: { [s: string]: number };
-    }
-
-    const chart: Chart = {
-      factors: ['a', 'b', 'c', 'd', 'e'],
-      editCode: true,
-      series: [
-        {
-          business: 'abc',
-          color: '#1f77b4',
-          symbol: 'square',
-          dash: '0',
-          offerings: {
-            a: 0.5,
-            b: 1,
-            c: 0.2
-          }
-        },
-        {
-          business: 'def',
-          color: '#8f47b4',
-          symbol: 'circle',
-          dash: '1',
-          offerings: {
-            a: 0.2,
-            c: 0.3,
-            d: 0.5,
-            e: 1
-          }
-        }
-      ]
-    };
     const profile = {
       markerSize: 10
     };
-
+/* todo fix state?
     let oldFactors: string[] = [];
     let seriesOrder = '';
     let lastClickTimeStamp = 0;
+*/
 
     const elm = $(ref);
 
     /*
+    TODO FIX
   $(elm).mousewheel(function(event, delta) {
     elm[0].scrollLeft -= (delta * 30);
         event.preventDefault();
@@ -85,9 +36,9 @@ function useHookWithRefCallback() {
     let $svg = elm.find('svg');
 
     //d3js ordinal scale only works on simple array
-    let factorNames: Array<string> = chart.factors.map(f => f);
+    let factorNames: Array<string> = chart.factors.slice(0);
 
-    let delay = oldFactors.length > factorNames.length ? 500 : 0;
+    // TODO: let delay = oldFactors.length > factorNames.length ? 500 : 0;
     // delay standard transitions if delete factor
 
     //62 = 10 20 1 svg 1 20 10
@@ -111,13 +62,16 @@ function useHookWithRefCallback() {
 
     var line = d3.line();
 
+    /* TODO
     var currentSeriesOrder = chart.series.map(serie => serie.business).join('');
     var doTransition =
       oldFactors.length > 0 &&
       seriesOrder === currentSeriesOrder &&
       (oldFactors.length !== factorNames.length ||
         oldFactors.join('') === factorNames.join(''));
+    */
     /*
+    TODO FIX
   if(scope.remoteUpdate){
     scope.remoteUpdate = false;
     doTransition = true;
@@ -137,7 +91,7 @@ function useHookWithRefCallback() {
     }
 
     // Returns the path for a given data point.
-    function path(serie: Serie) {
+    function path(serie: models.Serie | any) {
       var points: Point[] = [];
       factorNames.forEach(function(factoreName) {
         if (
@@ -158,6 +112,8 @@ function useHookWithRefCallback() {
       selection: d3.Selection<any, any, any, any>,
       additionalCondition?: boolean
     ) {
+      return selection
+      /* TODO
       if (
         doTransition &&
         (additionalCondition === undefined || additionalCondition)
@@ -168,6 +124,7 @@ function useHookWithRefCallback() {
           .duration(500);
       }
       return selection;
+      */
     }
 
     // Create a scale for each trait.
@@ -282,7 +239,7 @@ function useHookWithRefCallback() {
       .style('fill', factorNames.length > 0 ? '#fbfbfb' : '#adc8e3');
 
     //animate only on delete delete
-    maybeTransiton(backBorder, oldFactors.length > factorNames.length)
+    maybeTransiton(backBorder) //TODO: , oldFactors.length > factorNames.length)
       .attr('width', w + 2)
       .attr('height', h + 2);
 
@@ -366,8 +323,8 @@ function useHookWithRefCallback() {
       .enter()
       .append('svg:path')
       .attr('class', 'line')
-      .attr('stroke-dasharray', (serie: Serie) => serie.dash)
-      .style('stroke', (serie: Serie) => serie.color)
+      .attr('stroke-dasharray', (serie: models.Serie) => serie.dash)
+      .style('stroke', (serie: models.Serie) => serie.color)
       .merge(svgPath);
     //update
     maybeTransiton(svgPath)
@@ -408,41 +365,7 @@ function useHookWithRefCallback() {
       .attr('y', 0)
       .attr('height', h);
 
-    //Add an axis and title.
-    var addOfferingHandler = null;
-    if (chart.editCode) {
-      addOfferingHandler = function(factorName: string) {
-        if (d3.event.type === 'touchstart') {
-          d3.event.stopPropagation();
-        }
-        if (d3.event.timeStamp - lastClickTimeStamp < 300) {
-          return false;
-        }
-
-        lastClickTimeStamp = d3.event.timeStamp;
-
-        /*
-      if ($(this).data('already')) {
-            $(this).data('already', false);
-            return false;
-        } else if (d3.event.type === 'touchstart') {
-            $(this).data('already', true);
-        }
-        */
-        /*
-      var pos = d3.event.changedTouches ? d3.touches(this,  d3.event.changedTouches)[0] : d3.mouse(this);
-      var v = Math.max(0, Math.min(1, y[factorName].invert(pos[1])));
-      */
-        // chart.addOffering(factorName, v);
-        console.log(factorName);
-      };
-
-      factorContainer
-        .on('touchstart', addOfferingHandler)
-        .on('click', addOfferingHandler);
-    }
-
-    factorContainerEnter
+    const factorDomain = factorContainerEnter
       .append('svg:g')
       .attr('class', 'axis')
       .append('svg:rect')
@@ -457,6 +380,42 @@ function useHookWithRefCallback() {
       .on('mousedown', function() {
         d3.event.stopPropagation();
       });
+
+    //Add an axis and title.
+    if (chart.editCode) {
+      const addOfferingHandler = function(this: any, factorName: string) {
+        if (d3.event.type === 'touchstart') {
+          d3.event.stopPropagation();
+        }
+        /*TODO
+        if (d3.event.timeStamp - lastClickTimeStamp < 300) {
+          return false;
+        }
+        lastClickTimeStamp = d3.event.timeStamp;
+        */
+
+        /*
+        TODO: FIX?
+          if ($(this).data('already')) {
+                $(this).data('already', false);
+                return false;
+            } else if (d3.event.type === 'touchstart') {
+                $(this).data('already', true);
+            }
+            */
+        const pos = d3.event.changedTouches
+          ? d3.touches(this, d3.event.changedTouches)[0]
+          : d3.mouse(this);
+        const v = Math.max(0, Math.min(1, y[factorName].invert(pos[1])));
+        chart.addOffering(factorName, v);
+        setRedraw({ redraw: true });
+        console.log(factorName);
+      };
+
+      factorDomain
+        .on('touchstart', addOfferingHandler)
+        .on('click', addOfferingHandler);
+    }
 
     factorContainerEnter
       .select('.axis')
@@ -526,98 +485,101 @@ function useHookWithRefCallback() {
       .remove();
 
     //handle factor dragging right-left
-    /*
-  if(chart.editCode){
-    var isDraging = false;
-    factorContainer
-    .call(d3.drag()
-    .subject((factorName) => {
-        return {
-          x : x(factorName as string),
-          y : null
-        };
-      })
-      .on('dragstart', (factorName) => {
-       isDraging = false;
+    if (chart.editCode) {
+      var isDraging = false;
+      factorContainerEnter.call(
+        d3
+          .drag<any, any>()
+          .subject(factorName => {
+            return {
+              x: x(factorName as string),
+              y: null
+            };
+          })
+          .on('start', function(this: any, factorName: string) {
+            isDraging = false;
 
-        var i = factorNames.indexOf(factorName);
-        //move to top visible
-        var node = d3.select(this).node();
-        if(node && node.parentNode) {
-          node.parentNode.appendChild(node);
-        }
-        const node2 = backgroundGroup.node() as Element;
-        if(node2 && backgroundFactor[0][i]) {
-          node2.appendChild(backgroundFactor[0][i]);
-        }
-      })
-      .on('drag', function (factorName:string) {
-        if( !isDraging && Math.abs(x(factorName) - d3.event.x) < 30){
-          return;
-        }
-        isDraging = true;
-        var i = x.domain().indexOf(factorName);
-        x.range()[i] = d3.event.x;
-        factorNames.sort(function(a, b) {
-          return (x(a) || 0) - (x(b) || 0);
-        });
-        var dragX = x(factorName);
+            var i = factorNames.indexOf(factorName);
+            //move to top visible
+            var node = d3.select(this).node();
+            if (node && node.parentNode) {
+              node.parentNode.appendChild(node);
+            }
+            const node2 = backgroundGroup.node() as Element;
+            if (node2) {
+              const factorRect: any = backgroundFactor.nodes()[i];
+              if (factorRect) {
+                node2.appendChild(factorRect);
+              }
+            }
+          })
+          .on('drag', function(factorName: string) {
+            if (
+              !isDraging &&
+              Math.abs((x(factorName) || 0) - d3.event.x) < 30
+            ) {
+              return;
+            }
+            isDraging = true;
+            const currentX: {[s:string]:number} = factorNames.reduce((currentX: {[s:string]:number}, factorName) => {
+              currentX[factorName] = x(factorName) || 0;
+              return currentX;
+            }, {});
+            currentX[factorName] = d3.event.x;
+            factorNames.sort((a, b) => currentX[a] - currentX[b]);
+            x.domain(factorNames).range([0, w]);
+            const dragX = d3.event.x;
 
-        foreground.selectAll('.foreground .line').attr('d', path);
-        x.domain(factorNames).bandwidth([ 0, w ]);
+            foreground.selectAll('.foreground .line').attr('d', path);
 
-        if(!supportForeignObject){ //ie...
-          var pos = $('#mychart .legendbackground').offset();
-            d3.select(elm[0]).selectAll('div.iexlegend')
-            .attr('style', function(d){
-              return 'top:' + (pos.top - 85) + 'px;' +
-                'left:' + ((d === factorName ? dragX : x(d)) + pos.left-41) + 'px;' +
-                'width:' + x.bandwidth() + 'px;';})
-              .text(String);
-        }
+            factorContainer
+              .filter(':last-child')
+              .attr('transform', 'translate(' + dragX + ')');
+            factorContainer
+              .filter(':not(:last-child)')
+              .transition()
+              .duration(200)
+              .ease(d3.easeLinear)
+              .attr('transform', function(d) {
+                return 'translate(' + x(d) + ')';
+              });
 
-        factorContainer.filter(':last-child').attr('transform', 'translate('+ dragX + ')');
-        factorContainer.filter(':not(:last-child)').transition().duration(200).ease('linear')
-        .attr('transform',  function(d){ return 'translate(' + x(d) + ')';});
-
-        backgroundFactor.style('fill', updateBandingBackground);
-        backgroundFactor.filter(':last-child').attr('x', dragX);
-        backgroundFactor.filter(':not(:last-child)').transition().duration(200).ease('linear')
-        .attr('x',  function(d){ return x(d);});
-      })
-      .on('dragend', function () {
-        isDraging = false;
-
-        x.domain(factorNames).bandwidth([ 0, w ]);
-
-        var t = d3.transition().duration(500);
-        t.selectAll('.factor').attr('transform',function(d) {
-          return 'translate(' + x(d) + ')';
-        });
-
-        if(!supportForeignObject){
-          var pos = $('#mychart .legendbackground').offset();
-            t.selectAll('div.iexlegend')
-            .style('left', function(d){
-              return (x(d) + pos.left-41) + 'px';
+            backgroundFactor.style('fill', updateBandingBackground);
+            backgroundFactor.filter(':last-child').attr('x', dragX).style('fill', '#90caf9');
+            backgroundFactor
+              .filter(':not(:last-child)')
+              .transition()
+              .duration(200)
+              .ease(d3.easeLinear)
+              .attr('x', (d: any) => x(d) || 0);
+          })
+          .on('end', function() {
+            isDraging = false;
+            x.domain(factorNames).range([0, w]);
+            backgroundFactor.style('fill', updateBandingBackground);
+            var t = d3.transition().duration(500);
+            t.selectAll('.factor').attr('transform', function(d: any) {
+              return 'translate(' + (x(d) || 0) + ')';
             });
-        }
 
-
-        backgroundGroup.selectAll('.backgroundFactor').attr('x',  function(factorName){ return x(factorName);});
-        t.selectAll('.foreground .line').attr('d', path);
-        t.transition().each('end', function(){
-          if(factorNames.join('') !== chart.factors.join('')){
-            scope.$apply(function(){
-              chart.notifyFactorsChange(factorNames);
-              log.event('factor', 'dragged', chart.editCode);
+            backgroundGroup
+              .selectAll('.backgroundFactor')
+              .attr('x', function(factorName: any) {
+                return x(factorName) || 0;
+              });
+            t.selectAll('.foreground .line').attr('d', path);
+            t.transition().on('end', () => {
+              console.log('end');
+              if (factorNames.join('') !== chart.factors.join('')) {
+                // TODO FIX chart.notifyFactorsChange(factorNames);
+                // log.event('factor', 'dragged', chart.editCode);
+                chart.factors = factorNames.slice(0);
+                setRedraw({redraw: true});
+              }
             });
-          }
-        });
-      })
-    );
-  }//end edit
-  */
+          })
+      );
+    } //end edit
 
     maybeTransiton(factorContainer).attr('transform', function(factorName) {
       return 'translate(' + x(factorName) + ')';
@@ -681,7 +643,7 @@ function useHookWithRefCallback() {
       .attr('d', function(d) {
         return d3
           .symbol()
-          .type(() => SymbolsLookup[d.serie.symbol])
+          .type(() => models.SymbolsLookup[d.serie.symbol])
           .size(() => profile.markerSize * 10)();
       })
       .style('fill', function(d) {
@@ -689,73 +651,110 @@ function useHookWithRefCallback() {
       });
 
     if (chart.editCode) {
-      marker
+      markerEnter
         .select('rect')
         .attr('x', -domainWidth / 2)
         .attr('width', domainWidth);
-      /*
-  marker.call(
-    d3.drag()
-    /*
-    .subject(function(point:) {
-        return {
-          y : y[point.factorName](point.serie.offerings[point.factorName])
-        };
-      })
-.on('dragstart', function(point){
-        //make dragged serie top one
-        var index = foreground.selectAll('.line').data().indexOf(point.serie) + 1;
-        foreground.node().appendChild(foreground.select('.line:nth-child(' + index + ')').node());
-        d3.selectAll('.dot').each(function(p){
-          if(p.serie === point.serie){
-            this.parentNode.appendChild(this);
-          }
-        });
+      marker.call(
+        d3
+          .drag<any, any>()
+          .subject(function(point: any) {
+            return {
+              y: y[point.factorName](point.serie.offerings[point.factorName])
+            };
+          })
+          .on('start', function(point: any) {
+            //make dragged serie top one
+            var index =
+              foreground
+                .selectAll('.line')
+                .data()
+                .indexOf(point.serie) + 1;
+            foreground
+              .node()
+              .appendChild(
+                foreground.select('.line:nth-child(' + index + ')').node()
+              );
+            d3.selectAll('.dot').each(function(this: any, p: any) {
+              if (p.serie === point.serie) {
+                this.parentNode.appendChild(this);
+              }
+            });
 
-        d3.event.sourceEvent.stopPropagation(); //we do not want to start drag on factor
-
-      })
-      .on('drag', function(point){
-        var v = y[point.factorName].invert(d3.event.y);
-        if( v < -0.05 && v >= -0.10){
-          point.serie.offerings[point.factorName] = v;
-          d3.select(this)
-          .attr('transform', function(d){ return 'translate('+(x.rangeBand()/2)+','+y[d.factorName](d.serie.offerings[d.factorName])+')';})
-          .select('path')
-          .attr('d', function(d){ return d3.svg.symbol()
-                                         .type(d.serie.symbol)
-                                         .size(function(){return scope.profile.markerSize*10 * (0.15 + v) / 0.1 ;})();
-                                }
-          );
-        }else if(v < -0.10){
-            point.serie.offerings[point.factorName] = undefined;
-            d3.select(this)
-          .attr('transform', function(){ return 'translate('+(x.rangeBand()/2)+',0)';})
-          .select('path')
-          .attr('d', function(d){ return d3.svg.symbol()
-                                         .type(d.serie.symbol)
-                                         .size(function(){return 0 ;})();
-                                }
-          );
-        }else{
-          point.serie.offerings[point.factorName] = Math.max(0, Math.min(1, v));
-          d3.select(this)
-          .attr('transform', function(d){ return 'translate('+(x.rangeBand()/2)+','+y[d.factorName](d.serie.offerings[d.factorName])+')';});
-          foreground.selectAll('.line').attr('d', path);
-        }
-      })
-      .on('dragend', function(point){
-          //normalize value if set
-          if( point.serie.offerings[point.factorName] !== undefined ){
-            point.serie.offerings[point.factorName] = Math.max(0, Math.min(1, point.serie.offerings[point.factorName]));
-            // TODO fix chart.notifyOfferingChange(point.serie, point.factorName, point.serie.offerings[point.factorName]);
-          } else {
-            //TODO fix chart.notifyOfferingChange(point.serie, point.factorName, point.serie.offerings[point.factorName]);
-            //log.event('offering', 'remove', chart.editCode);
-          }
-      }));
-  );
-        */
+            d3.event.sourceEvent.stopPropagation(); //we do not want to start drag on factor
+          })
+          .on('drag', function(this: any, point: any) {
+            var v = y[point.factorName].invert(d3.event.y);
+            if (v < -0.05 && v >= -0.1) {
+              point.serie.offerings[point.factorName] = v;
+              d3.select(this)
+                .attr('transform', function(d: any) {
+                  return (
+                    'matrix(1, 0, 0, 1,' +
+                    x.bandwidth() / 2 +
+                    ',' +
+                    y[d.factorName](d.serie.offerings[d.factorName]) +
+                    ')'
+                  );
+                })
+                .select('path')
+                .attr('d', function(d: any) {
+                  return d3
+                    .symbol()
+                    .type(models.SymbolsLookup[d.serie.symbol])
+                    .size(function() {
+                      return (profile.markerSize * 10 * (0.15 + v)) / 0.1;
+                    })();
+                });
+            } else if (v < -0.1) {
+              point.serie.offerings[point.factorName] = -1;
+              d3.select(this)
+                .attr('transform', function() {
+                  return 'matrix(1, 0, 0, 1,' + x.bandwidth() / 2 + ',0)';
+                })
+                .select('path')
+                .attr('d', function(d: any) {
+                  return d3
+                    .symbol()
+                    .type(models.SymbolsLookup[d.serie.symbol])
+                    .size(function() {
+                      return 0;
+                    })();
+                });
+            } else {
+              point.serie.offerings[point.factorName] = Math.max(
+                0,
+                Math.min(1, v)
+              );
+              d3.select(this).attr('transform', function(d: any) {
+                return (
+                  'matrix(1, 0, 0, 1,' +
+                  x.bandwidth() / 2 +
+                  ',' +
+                  y[d.factorName](d.serie.offerings[d.factorName]) +
+                  ')'
+                );
+              });
+              foreground.selectAll('.foreground .line').attr('d', path);
+            }
+          })
+          .on('end', function(point: any) {
+            //normalize value if set
+            if (point.serie.offerings[point.factorName] === -1) {
+              //TODO fix chart.notifyOfferingChange(point.serie, point.factorName, point.serie.offerings[point.factorName]);
+              chart.removeOffering(point.serie, point.factorName);
+              setRedraw({ redraw: true });
+              //log.event('offering', 'remove', chart.editCode);
+            } else {
+              point.serie.offerings[point.factorName] = Math.max(
+                0,
+                Math.min(1, point.serie.offerings[point.factorName])
+              );
+              setRedraw({ redraw: true });
+              // TODO fix chart.notifyOfferingChange(point.serie, point.factorName, point.serie.offerings[point.factorName]);
+            }
+          })
+      );
     }
 
     maybeTransiton(marker).attr('transform', function(d) {
@@ -769,23 +768,24 @@ function useHookWithRefCallback() {
     });
 
     //save length to determine if we want transitions or not next time
+    /*
     oldFactors = factorNames.slice(0);
     seriesOrder = chart.series
       .map(function(serie) {
         return serie.business;
       })
       .join('');
-
+      */
     return () => {
       // cleanup
     };
-  }, [ref]);
+  }, [ref, redraw, chart]);
 
   return [setRef];
 }
 
-const Chart = () => {
-  const [ref] = useHookWithRefCallback();
+const Chart = (props:{chart:models.Chart}) => {
+  const [ref] = useHookWithRefCallback(props.chart);
 
   return <div ref={ref} id="mychart" />;
 };
