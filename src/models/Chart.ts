@@ -42,14 +42,16 @@ export const symbolsPaths:{[s: string]:string} = symbols.reduce((all:{[s: string
 }, {});
 
 export class Chart {
-  factors:string[] = [];
-  editCode: boolean = true;
-  series: Serie[] = [];
+  title:string;
+  factors:string[];
+  editCode:boolean;
+  series:Serie[];
 
-  constructor({ factors, editCode, series}:{factors:string[], editCode:boolean, series:Serie[]}) {
-    this.factors = factors;
-    this.editCode = editCode;
-    this.series = series;
+  constructor({ factors, editCode, series, title}:{factors?:string[], editCode:boolean, series?:Serie[], title?:string}) {
+    this.factors = factors || [];
+    this.editCode = editCode || false;
+    this.series = series || [];
+    this.title = title || 'New Chart'
   }
 
   addOffering(factorName:string, value:number) {

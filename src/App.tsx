@@ -5,8 +5,9 @@ import { Button, Box, Container, Link, Typography } from '@material-ui/core';
 import ProTip from './ProTip';
 import TodoList from './TodoList';
 import Chart from './Chart';
-import Legends from './Legends';
+import Legends from './components/legends/Legends';
 import * as models from './models/Chart';
+import EditTitleDialog from './components/dialogs/EditTitleDialog';
 
 function MadeWithLove() {
   return (
@@ -20,11 +21,11 @@ function MadeWithLove() {
   );
 }
 
-
-
 const App: React.FC = () => {
   const [count, setCount] = useState(0);
+  const [isOpenTitleDialog, setOpenTitleDialog] = useState(false);
   const [chart, setChart] = useState(new models.Chart({
+    title: 'test chart',
     factors: ['a', 'b', 'c', 'd', 'e'],
     editCode: true,
     series: [
@@ -59,8 +60,22 @@ const App: React.FC = () => {
     setChart(chart);
   };
 
+  function handleEditTitleClose(e:any, reason:string, payload:any) {
+    if (reason === 'save') {
+      chart.title = payload;
+      setChart(chart);
+    }
+    setOpenTitleDialog(false);
+  }
+
   return (
     <Container>
+      <header>
+        <Typography onClick={() => {setOpenTitleDialog(true)}} variant="h4" component="h1">
+          {chart.title}
+        </Typography>
+        <EditTitleDialog value={chart.title} open={isOpenTitleDialog} onClose={handleEditTitleClose} />
+      </header>
       <Legends chart={chart} />
       <Chart chart={chart}/>
       <Box my={4}>
