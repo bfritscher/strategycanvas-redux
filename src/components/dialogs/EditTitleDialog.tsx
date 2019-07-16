@@ -13,8 +13,13 @@ const Transition = React.forwardRef<unknown, TransitionProps>(
     return <Slide direction="down" ref={ref} {...props} />;
   }
 );
+interface EditTitleDialogProps {
+  value?: string;
+  open: boolean;
+  onClose?: any;
+}
 
-function EditTitleDialog({ value, open, onClose }: any) {
+function EditTitleDialog({ value, open, onClose }: EditTitleDialogProps) {
   const [name, setName] = React.useState(value);
 
   function handleChange(event: any) {
@@ -53,11 +58,12 @@ function EditTitleDialog({ value, open, onClose }: any) {
         </DialogContent>
         <DialogActions>
           <Button onClick={onClose}>Cancel</Button>
-          <Button type="submit" color="primary">Save</Button>
+          <Button type="submit" color="primary">
+            Save
+          </Button>
         </DialogActions>
       </ValidatorForm>
     </Dialog>
   );
 }
-
 export default EditTitleDialog;

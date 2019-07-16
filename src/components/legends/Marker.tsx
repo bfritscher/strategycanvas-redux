@@ -1,10 +1,14 @@
 import React from 'react';
 import * as models from '../../models/Chart';
 
-function Marker(props: any) {
-  const serie = props.serie;
+interface MarkerProps {
+  serie:models.Serie
+  onClick?:any
+}
+
+function Marker({serie, onClick}:MarkerProps) {
   return (
-    <div className="marker" onClick={props.onClick}>
+    <div className="marker" onClick={onClick}>
       <svg width="100%" height="100%">
         <path
           d="m0,16h36"
