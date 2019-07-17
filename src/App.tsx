@@ -1,25 +1,11 @@
 import React, { useState } from 'react';
-import logo from './logo.svg';
 import withRoot from './withRoot';
-import { Button, Box, Container, Link, Typography } from '@material-ui/core';
-import ProTip from './ProTip';
+import { Button, Box, Container, Typography } from '@material-ui/core';
 import TodoList from './TodoList';
 import Chart from './Chart';
 import Legends from './components/legends/Legends';
 import * as models from './models/Chart';
 import EditTitleDialog from './components/dialogs/EditTitleDialog';
-
-function MadeWithLove() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Built with love by the '}
-      <Link color="inherit" href="https://material-ui.com/">
-        Material-UI
-      </Link>
-      {' team.'}
-    </Typography>
-  );
-}
 
 const App: React.FC = () => {
   const [count, setCount] = useState(0);

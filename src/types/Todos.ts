@@ -2,11 +2,13 @@
 /* eslint-disable */
 // This file was automatically generated and should not be edited.
 
+import { order_by } from "./graphql-global-types";
+
 // ====================================================
-// GraphQL query operation: getMyTodos
+// GraphQL query operation: Todos
 // ====================================================
 
-export interface getMyTodos_todos {
+export interface Todos_todos {
   __typename: "todos";
   id: number;
   title: string;
@@ -14,9 +16,13 @@ export interface getMyTodos_todos {
   is_completed: boolean;
 }
 
-export interface getMyTodos {
+export interface Todos {
   /**
    * fetch data from the table: "todos"
    */
-  todos: getMyTodos_todos[];
+  todos: Todos_todos[];
+}
+
+export interface TodosVariables {
+  order_by?: order_by | null;
 }

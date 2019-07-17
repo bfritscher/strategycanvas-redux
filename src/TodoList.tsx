@@ -1,12 +1,13 @@
 import React from 'react';
 import gql from 'graphql-tag';
 import { Query } from 'react-apollo';
+import { Todos, TodosVariables } from './types/Todos';
 
-const GET_MY_TODOS = gql`
-  query getMyTodos {
+const todosQuery = gql`
+  query Todos($order_by:order_by=desc) {
     todos(
       where: { is_public: { _eq: false } }
-      order_by: { created_at: desc }
+      order_by: { created_at: $order_by }
     ) {
       id
       title
@@ -16,20 +17,9 @@ const GET_MY_TODOS = gql`
   }
 `;
 
-type Todo = {
-  id: number;
-  title: string;
-  is_completed: boolean;
-  created_at: Date;
-};
-
-interface Data {
-  todos: Array<Todo>
-}
-
 const TodoList = () => {
   return (
-    <Query<Data> query={GET_MY_TODOS}>
+    <Query<Todos, TodosVariables> query={todosQuery}>
       {({ loading, error, data }) => {
         if (loading) {
           return <div>Loading...</div>;
