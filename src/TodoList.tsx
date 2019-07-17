@@ -2,11 +2,11 @@ import React from 'react';
 import gql from 'graphql-tag';
 import { Query } from 'react-apollo';
 import { Todos, TodosVariables } from './types/Todos';
+import { order_by } from './types/graphql-global-types';
 
 const todosQuery = gql`
   query Todos($order_by:order_by=desc) {
     todos(
-      where: { is_public: { _eq: false } }
       order_by: { created_at: $order_by }
     ) {
       id
@@ -18,8 +18,11 @@ const todosQuery = gql`
 `;
 
 const TodoList = () => {
+  const [sort, setSort] = React.useState(order_by.desc);
   return (
-    <Query<Todos, TodosVariables> query={todosQuery}>
+    <>
+    <div onClick={()=> setSort(sort === order_by.asc ? order_by.desc : order_by.asc)}>{sort}</div>
+    <Query<Todos, TodosVariables> query={todosQuery} variables={{order_by: sort}}>
       {({ loading, error, data }) => {
         if (loading) {
           return <div>Loading...</div>;
@@ -38,6 +41,7 @@ const TodoList = () => {
         }
       }}
     </Query>
+    </>
   );
 };
 
